@@ -33,4 +33,16 @@ const Footer: React.FC = () => {
                 <ul className="space-y-2">
                   <li>
                     <p>L.Chethan (RA2311003010515)</p>
-                    <a href="mail
+                    <a href="mailto:l.chethan@srmist.edu.in" className="text-green-100 hover:text-white transition-colors duration-200">l.chethan@srmist.edu.in</a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+};
+
+export default Footer;
