@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import DatePicker from 'react-datepicker';
+import "react-datepicker/dist/react-datepicker.css";
 import { FormData, MealType, MessType } from '../types';
-import { getDates, getMealTypes, getMessTypes } from '../data/wasteData';
+import { getMealTypes, getMessTypes } from '../data/wasteData';
 
 interface SelectionFormProps {
   onSubmit: (formData: FormData) => void;
@@ -8,14 +10,22 @@ interface SelectionFormProps {
 
 const SelectionForm: React.FC<SelectionFormProps> = ({ onSubmit }) => {
   const [formData, setFormData] = useState<FormData>({
-    date: '',
+    date: new Date().toISOString().split('T')[0],
     mealType: 'Lunch' as MealType,
     messType: 'SANNASI MESS' as MessType,
   });
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
 
-  const dates = getDates();
   const mealTypes = getMealTypes();
   const messTypes = getMessTypes();
+
+  const handleDateChange = (date: Date) => {
+    setSelectedDate(date);
+    setFormData(prev => ({
+      ...prev,
+      date: date.toISOString().split('T')[0]
+    }));
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -36,21 +46,13 @@ const SelectionForm: React.FC<SelectionFormProps> = ({ onSubmit }) => {
             <label htmlFor="date" className="block text-sm font-medium text-gray-700">
               Date
             </label>
-            <select
-              id="date"
-              name="date"
-              value={formData.date}
-              onChange={handleChange}
-              required
+            <DatePicker
+              selected={selectedDate}
+              onChange={handleDateChange}
               className="w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-200 focus:ring-opacity-50 py-2 px-3 border"
-            >
-              <option value="">Select a date</option>
-              {dates.map(date => (
-                <option key={date} value={date}>
-                  {date}
-                </option>
-              ))}
-            </select>
+              dateFormat="yyyy-MM-dd"
+              maxDate={new Date()}
+            />
           </div>
 
           <div className="space-y-2">
@@ -65,7 +67,6 @@ const SelectionForm: React.FC<SelectionFormProps> = ({ onSubmit }) => {
               required
               className="w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-200 focus:ring-opacity-50 py-2 px-3 border"
             >
-              <option value="">Select meal type</option>
               {mealTypes.map(mealType => (
                 <option key={mealType} value={mealType}>
                   {mealType}
@@ -86,7 +87,6 @@ const SelectionForm: React.FC<SelectionFormProps> = ({ onSubmit }) => {
               required
               className="w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-200 focus:ring-opacity-50 py-2 px-3 border"
             >
-              <option value="">Select mess type</option>
               {messTypes.map(messType => (
                 <option key={messType} value={messType}>
                   {messType}

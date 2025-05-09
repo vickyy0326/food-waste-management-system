@@ -31,6 +31,45 @@ const WasteDisplay: React.FC<WasteDisplayProps> = ({ formData }) => {
     colorClass = 'bg-yellow-500';
   }
 
+  const handleDownload = () => {
+    const reportData = {
+      date: formData.date,
+      mealType: formData.mealType,
+      messType: formData.messType,
+      wasteQuantity: wasteData.quantity,
+      unit: wasteData.uom,
+    };
+
+    const blob = new Blob([JSON.stringify(reportData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `waste-report-${formData.date}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleShare = async () => {
+    const shareData = {
+      title: 'Food Waste Report',
+      text: `Food waste report for ${formData.messType} on ${formData.date} (${formData.mealType}): ${wasteData.quantity} ${wasteData.uom}`,
+      url: window.location.href,
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(shareData.text);
+        alert('Report details copied to clipboard!');
+      }
+    } catch (error) {
+      console.error('Error sharing:', error);
+    }
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-md p-6 mt-6 max-w-2xl mx-auto transform transition-all duration-300 ease-in-out">
       <h2 className="text-xl font-semibold text-center text-gray-800 mb-6">
@@ -74,10 +113,16 @@ const WasteDisplay: React.FC<WasteDisplayProps> = ({ formData }) => {
       </div>
 
       <div className="mt-8 flex justify-center">
-        <button className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md mr-2 shadow-sm transition duration-200 ease-in-out">
+        <button 
+          onClick={handleDownload}
+          className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md mr-2 shadow-sm transition duration-200 ease-in-out"
+        >
           Download Report
         </button>
-        <button className="bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-md shadow-sm transition duration-200 ease-in-out">
+        <button 
+          onClick={handleShare}
+          className="bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-md shadow-sm transition duration-200 ease-in-out"
+        >
           Share Results
         </button>
       </div>
